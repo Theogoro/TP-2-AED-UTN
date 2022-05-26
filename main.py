@@ -1,6 +1,6 @@
 import random
 
-# 2) realizar una apuesta, multiplo de 5 y menor al pozo
+# 2) 
 """
 El jugador recibe dos cartas inicialmente y a partir de ese momento puede seguir pidiendo cartas hasta que decida frenar o bien logre 21 o se pase.
 El valor del AS no es fijo. Cuando el jugador o el crupier lo recibe puede sumar 11 mientras no pase de 21. Si siguiera pidiendo cartas y se pasara, el valor del AS vuelve a 1.
@@ -53,18 +53,100 @@ def solicitar_fondos():
 def solicitar_apuesta():
   pass
 
+# Dada una carta y el puntaje actual, retorna el puntaje de la carta
+def obtener_puntaje_carta(carta, puntaje_actual):
+  if carta[0] >= 10:  # 10,J,Q,K
+    return 10
+  elif carta[0] == 1:  # A
+    return obtener_valor_as(puntaje_actual)
+    
+  # Cualq otra
+  return carta[0]
 
-def puntaje_carta(c1, *c2=0):
   
+# Si el puntaje actual + 11 <= 21, entonces devolver 11
+# Sino, devolver 1
+def obtener_valor_as(puntaje_actual):
+  if puntaje_actual + 11 <= 21:
+    return 11
 
+  return 1
+
+def mostrar_carta(carta):
+  return "[" + carta[1] + " " + carta[2] + "] "
+
+def es_blackjack(puntaje):
+  return puntaje == 21
 
 def jugar_mano():
-  carta_pc_1 = generar_carta() # Genera 1 carta para el croupier
-  puntaje_parcial_pc = puntaje_carta(carta_pc_1) # Muestra puntaje parcial croupier
-  carta_pj_1 = generar_carta() 
-  carta_pj_2 = generar_carta() # Genera 2 cartas para el jugador
-  puntaje_parcial_pj = puntaje_carta(carta_pj_1, carta_pj_2) # Muestra puntaje parcial del jugador
+  carta_jugador_1 = generar_carta()
+  carta_jugador_2 = generar_carta()
+  puntaje_jugador = obtener_puntaje_carta(carta_jugador_1, 0)
+  puntaje_jugador += obtener_puntaje_carta(carta_jugador_2, puntaje_jugador)
+  es_bj_nat_jug = es_blackjack(puntaje_jugador)
+  
+  carta_crupier_1  = generar_carta()
+  puntaje_crupier = obtener_puntaje_carta(carta_crupier_1, 0)
+  str_cartas_jugador = mostrar_carta(carta_jugador_1) + mostrar_carta(carta_jugador_2)
+  str_cartas_crupier = mostrar_carta(carta_crupier_1)
+  
+  print("\nMANO INICIAL")
+  print(">> Cartas del jugador:")
+  print(str_cartas_jugador)
+  print(">> Puntaje actual:", puntaje_jugador)
+  print("\n>> Cartas crupier:")
+  print(str_cartas_crupier)
+  print(">> Puntaje actual:", puntaje_crupier)
+  
 
+  robo = None
+
+  # [] TO-DO: Refactor -> Agregar metodo
+  while puntaje_jugador <= 21 and (robo is None or len(robo) == 0 or robo not in ("s", "n") or robo == 's'):
+    if robo is not None and robo != "s":
+      print("Valor no valido")
+    elif robo == "s":
+      nueva_carta = generar_carta()
+      puntaje_jugador += obtener_puntaje_carta(nueva_carta, puntaje_jugador)
+      str_cartas_jugador += mostrar_carta(nueva_carta)
+      print(str_cartas_jugador)
+      print(">> Puntaje actual:", puntaje_jugador)
+
+      if puntaje_jugador > 21:
+        print(">> El jugador se pasó de 21.")
+
+    if puntaje_jugador < 21:
+      robo = input("\nQuiere robar otra carta (S/N)?:").lower()
+
+  es_bj_nat_crup = False
+  es_seg_carta_crupier = True
+  
+  print("\n>> Juego Crupier")
+  while puntaje_crupier <= 16:
+    print(">> El crupier da otra carta...")
+    nueva_carta = generar_carta()
+    puntaje_crupier += obtener_puntaje_carta(nueva_carta, puntaje_crupier)
+    str_cartas_crupier += mostrar_carta(nueva_carta)
+    print(str_cartas_crupier)
+    print(">> Puntaje actual:", puntaje_crupier)
+
+    # Comprobar si el crupier tiene un bj natural en la 2da carta
+    if es_seg_carta_crupier:
+      if puntaje_crupier == 21:
+        es_bj_nat_crup = True
+        
+      es_seg_carta_crupier = False
+    
+# -1 Gana el crupier
+# 0  Empate
+# 1  Gana el jugador
+def definir_ganador(puntaje_jugador, puntaje_crupier):
+  #if puntaje_jugador == puntaje_crupier:
+  #  print('empate')
+  #elif puntaje_
+  #elif puntaje_jugador > puntaje_crupier:
+  pass
+  
 
 def generar_carta():
   cartas = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
@@ -78,7 +160,7 @@ def generar_carta():
   return valor_carta, carta, palo
 
 
-# INICIO
+# ------ INICIO
 # Nombre del jugador
 jugador = input("Ingrese nombre del jugador: ")
 # Si vacia se llama anonymus
@@ -86,6 +168,7 @@ jugador = input("Ingrese nombre del jugador: ")
 if len(jugador) == 0:
   print("El jugador se quiere mantener en el anonimato, se lo llamara: Anónimo")
   jugador = "Anónimo"
+  
 print("Bienvenido,", jugador)
   
 # Monto para el pozo
