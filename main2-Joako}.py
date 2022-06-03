@@ -65,6 +65,17 @@ def generar_carta():
     return carta, palo
 
 
+# 1 - AS
+
+# For
+  # 2 - AS
+
+# For
+  # 2 - K
+
+
+
+
 def puntaje_carta(c1, *c2):
     if c1[0] == "J" or c1[0] == "Q" or c1[0] == "K":
         valor_1 = 10
@@ -72,7 +83,7 @@ def puntaje_carta(c1, *c2):
         valor_1 = 11
     else:
         valor_1 = int(c1[0])
-
+    
     puntaje_parcial = valor_1
     if len(c2) != 0:
         for c in c2:
@@ -88,10 +99,31 @@ def puntaje_carta(c1, *c2):
             puntaje_parcial += valor_2
 
             if puntaje_parcial > 21 and (c1[0] == "A" or c[0] == "A"):
+              if cant_as > 0:
                 puntaje_parcial -= 10
+                cant_as -= 1
 
     return puntaje_parcial
 
+# carta, puntaje, cantidad_as
+def puntaje_carta_2(carta, puntaje, cantidad_as):
+  valor_carta = carta[0]
+
+  if valor_carta >= 10: # JKQ
+    puntaje += 10
+  elif valor_carta == 1:
+    cantidad_as += 1 # Cantidad AS
+    puntaje += 11
+  else:
+    puntaje += valor_carta
+
+  # Hacer retroactivos los AS
+  while puntaje > 21 and cantidad_as > 0:
+    puntaje -= 10
+    cantidad_as -= 1
+
+  return puntaje, cantidad_as
+  
 
 def apuestas(pozo):
     apuesta = int(input("Realice su apuesta (Debe ser un multiplo de 5):_$"))
